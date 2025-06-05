@@ -1,0 +1,9 @@
+node_modules/
+.env
+*.log
+dist/
+.angular/
+exam-system-backend/node_modules/
+exam-system-frontend/node_modules/
+exam-system-backend/.env
+exam-system-frontend/dist/
