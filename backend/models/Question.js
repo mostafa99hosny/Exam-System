@@ -1,3 +1,4 @@
+// Question model for MongoDB using Mongoose
 const mongoose = require('mongoose');
 
 const questionSchema = new mongoose.Schema({

@@ -1,3 +1,4 @@
+// Result model for MongoDB using Mongoose
 const mongoose = require('mongoose');
 
 const resultSchema = new mongoose.Schema({
