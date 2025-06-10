@@ -1,1 +1,629 @@
-<p>student-dashboard works!</p>
+<div class="student-dashboard">
+  <!-- Header with Navigation -->
+  <mat-toolbar class="dashboard-header">
+    <div class="header-content">
+      <div class="brand-section">
+        <mat-icon class="brand-icon">school</mat-icon>
+        <div class="brand-text">
+          <h1 class="brand-title">Student Portal</h1>
+          <p class="brand-subtitle">Learning Management System</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- Notifications -->
+        <button mat-icon-button [matMenuTriggerFor]="notificationMenu" class="notification-btn">
+          <mat-icon [matBadge]="getUnreadNotificationCount()"
+                    [matBadgeHidden]="getUnreadNotificationCount() === 0"
+                    matBadgeColor="warn">notifications</mat-icon>
+        </button>
+
+        <!-- User Menu -->
+        <button mat-icon-button [matMenuTriggerFor]="userMenu" class="user-btn">
+          <mat-icon>account_circle</mat-icon>
+        </button>
+      </div>
+    </div>
+  </mat-toolbar>
+
+  <!-- Notification Menu -->
+  <mat-menu #notificationMenu="matMenu" class="notification-menu">
+    <div class="notification-header">
+      <h3>Notifications</h3>
+      <button mat-button (click)="clearAllNotifications()" [disabled]="notifications.length === 0">
+        Clear All
+      </button>
+    </div>
+    <mat-divider></mat-divider>
+
+    @if (notifications.length > 0) {
+      @for (notification of notifications; track notification.id) {
+        <div class="notification-item" [class.unread]="!notification.read"
+             (click)="markNotificationAsRead(notification.id)">
+          <div class="notification-content">
+            <div class="notification-title">{{ notification.title }}</div>
+            <div class="notification-message">{{ notification.message }}</div>
+            <div class="notification-time">{{ getTimeAgo(notification.timestamp) }}</div>
+          </div>
+          <mat-icon class="notification-type-icon" [class]="notification.type">
+            {{ notification.type === 'success' ? 'check_circle' :
+               notification.type === 'warning' ? 'warning' : 'info' }}
+          </mat-icon>
+        </div>
+      }
+    } @else {
+      <div class="no-notifications">
+        <mat-icon>notifications_none</mat-icon>
+        <p>No notifications</p>
+      </div>
+    }
+  </mat-menu>
+
+  <!-- User Menu -->
+  <mat-menu #userMenu="matMenu" class="user-menu">
+    <div class="user-info">
+      <mat-icon class="user-avatar">account_circle</mat-icon>
+      <div class="user-details">
+        <div class="user-name">{{ currentUser?.username || 'Student' }}</div>
+        <div class="user-email">{{ currentUser?.email || 'student@example.com' }}</div>
+      </div>
+    </div>
+    <mat-divider></mat-divider>
+    <button mat-menu-item (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      <span>Logout</span>
+    </button>
+  </mat-menu>
+
+  <!-- Main Content -->
+  <main class="dashboard-main">
+    <!-- Navigation Tabs -->
+    <mat-tab-group [selectedIndex]="getSelectedTabIndex()"
+                   (selectedTabChange)="onTabChange($event)"
+                   class="dashboard-tabs">
+
+      <!-- Dashboard Tab -->
+      <mat-tab label="Dashboard">
+        <ng-template matTabContent>
+          <div class="tab-content dashboard-tab">
+            <div class="tab-header">
+              <h2 class="tab-title">
+                <mat-icon>dashboard</mat-icon>
+                Dashboard Overview
+              </h2>
+              <p class="tab-description">Your learning progress and statistics</p>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="stats-grid">
+              <mat-card class="stat-card total-exams">
+                <mat-card-content>
+                  <div class="stat-icon">
+                    <mat-icon>quiz</mat-icon>
+                  </div>
+                  <div class="stat-content">
+                    <div class="stat-value">{{ stats.totalExams }}</div>
+                    <div class="stat-label">Total Exams</div>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+
+              <mat-card class="stat-card completed-exams">
+                <mat-card-content>
+                  <div class="stat-icon">
+                    <mat-icon>check_circle</mat-icon>
+                  </div>
+                  <div class="stat-content">
+                    <div class="stat-value">{{ stats.completedExams }}</div>
+                    <div class="stat-label">Completed</div>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+
+              <mat-card class="stat-card average-score">
+                <mat-card-content>
+                  <div class="stat-icon">
+                    <mat-icon>trending_up</mat-icon>
+                  </div>
+                  <div class="stat-content">
+                    <div class="stat-value">{{ stats.averageScore }}%</div>
+                    <div class="stat-label">Average Score</div>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+
+              <mat-card class="stat-card completion-rate">
+                <mat-card-content>
+                  <div class="stat-icon">
+                    <mat-icon>donut_large</mat-icon>
+                  </div>
+                  <div class="stat-content">
+                    <div class="stat-value">{{ stats.completionRate }}%</div>
+                    <div class="stat-label">Completion Rate</div>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            </div>
+
+            <!-- Quick Actions and Recent Activity -->
+            <div class="dashboard-content">
+              <!-- Available Exams -->
+              <mat-card class="quick-actions-card">
+                <mat-card-header>
+                  <div mat-card-avatar class="card-avatar primary">
+                    <mat-icon>play_circle_outline</mat-icon>
+                  </div>
+                  <mat-card-title>Available Exams</mat-card-title>
+                  <mat-card-subtitle>Ready to take ({{ availableExams.length }})</mat-card-subtitle>
+                </mat-card-header>
+
+                <mat-card-content>
+                  @if (availableExams.length > 0) {
+                    <div class="exam-quick-list">
+                      @for (exam of availableExams.slice(0, 3); track exam._id) {
+                        <div class="exam-quick-item">
+                          <div class="exam-info">
+                            <div class="exam-title">{{ exam.title }}</div>
+                            <div class="exam-meta">
+                              <span class="exam-duration">
+                                <mat-icon>schedule</mat-icon>
+                                {{ formatDuration(exam.duration) }}
+                              </span>
+                            </div>
+                          </div>
+                          <button
+                            mat-raised-button
+                            [color]="getExamButtonText(exam) === 'Retry Exam' ? 'accent' : 'primary'"
+                            (click)="onTakeExam(exam)"
+                            [disabled]="!canTakeExam(exam) || loadingExam">
+                            {{ getExamButtonText(exam) }}
+                          </button>
+                        </div>
+                      }
+                    </div>
+                    @if (availableExams.length > 3) {
+                      <div class="view-all-link">
+                        <button mat-button color="primary" (click)="setActiveTab('exams')">
+                          View All {{ availableExams.length }} Exams
+                        </button>
+                      </div>
+                    }
+                  } @else {
+                    <div class="empty-state">
+                      <mat-icon>assignment_turned_in</mat-icon>
+                      <p>All exams completed! Great job! 🎉</p>
+                    </div>
+                  }
+                </mat-card-content>
+              </mat-card>
+
+              <!-- Recent Results -->
+              <mat-card class="recent-results-card">
+                <mat-card-header>
+                  <div mat-card-avatar class="card-avatar success">
+                    <mat-icon>assessment</mat-icon>
+                  </div>
+                  <mat-card-title>Recent Results</mat-card-title>
+                  <mat-card-subtitle>Your latest exam performances</mat-card-subtitle>
+                </mat-card-header>
+
+                <mat-card-content>
+                  @if (myResults.length > 0) {
+                    <div class="results-quick-list">
+                      @for (result of myResults.slice(0, 3); track result._id) {
+                        <div class="result-quick-item">
+                          <div class="result-info">
+                            <div class="result-exam">{{ result.examId.title || 'Exam' }}</div>
+                            <div class="result-date">{{ getTimeAgo(result.submittedAt) }}</div>
+                          </div>
+                          <div class="result-score" [class]="getScoreColor(result.percentage)">
+                            <span class="score-value">{{ result.percentage }}%</span>
+                            <span class="score-grade">{{ getGradeFromScore(result.percentage) }}</span>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                    @if (myResults.length > 3) {
+                      <div class="view-all-link">
+                        <button mat-button color="primary" (click)="setActiveTab('results')">
+                          View All Results
+                        </button>
+                      </div>
+                    }
+                  } @else {
+                    <div class="empty-state">
+                      <mat-icon>assignment</mat-icon>
+                      <p>No exam results yet. Take your first exam!</p>
+                    </div>
+                  }
+                </mat-card-content>
+              </mat-card>
+            </div>
+          </div>
+        </ng-template>
+      </mat-tab>
+
+      <!-- Exams Tab -->
+      <mat-tab label="Exams">
+        <ng-template matTabContent>
+          <div class="tab-content exams-tab">
+            <div class="tab-header">
+              <h2 class="tab-title">
+                <mat-icon>quiz</mat-icon>
+                Available Exams
+              </h2>
+              <p class="tab-description">Browse and take available examinations</p>
+            </div>
+
+            <!-- Search and Filters -->
+            <div class="search-section">
+              <mat-form-field appearance="outline" class="search-field">
+                <mat-label>Search Exams</mat-label>
+                <input
+                  matInput
+                  [(ngModel)]="searchTerm"
+                  (input)="onSearchChange()"
+                  placeholder="Search by exam title or description">
+                <mat-icon matPrefix>search</mat-icon>
+                <mat-hint>Find exams by title or description</mat-hint>
+              </mat-form-field>
+            </div>
+
+            <!-- Exam Categories -->
+            <div class="exam-categories">
+              <mat-chip-listbox class="category-chips">
+                <mat-chip-option [selected]="true">
+                  <mat-icon>all_inclusive</mat-icon>
+                  All Exams ({{ filteredExams.length }})
+                </mat-chip-option>
+                <mat-chip-option>
+                  <mat-icon>play_circle_outline</mat-icon>
+                  Available ({{ availableExams.length }})
+                </mat-chip-option>
+                <mat-chip-option>
+                  <mat-icon>check_circle</mat-icon>
+                  Completed ({{ completedExams.length }})
+                </mat-chip-option>
+              </mat-chip-listbox>
+            </div>
+
+            <!-- Exams Grid -->
+            @if (loading) {
+              <div class="loading-state">
+                <mat-spinner diameter="50"></mat-spinner>
+                <p>Loading exams...</p>
+              </div>
+            } @else if (filteredExams.length > 0) {
+              <div class="exams-grid">
+                @for (exam of filteredExams; track exam._id) {
+                  <mat-card class="exam-card" [class]="getExamStatusClass(exam)">
+                    <mat-card-header>
+                      <div mat-card-avatar [class]="'exam-avatar ' + getExamStatusClass(exam)">
+                        <mat-icon>{{ getExamStatusIcon(exam) }}</mat-icon>
+                      </div>
+                      <div class="exam-header-content">
+                        <mat-card-title class="exam-title">{{ exam.title }}</mat-card-title>
+                        <mat-card-subtitle class="exam-creator">By Admin</mat-card-subtitle>
+                      </div>
+                      <mat-chip class="status-chip" [class.status-passed]="getExamStatus(exam).includes('Passed')"
+                               [class.status-failed]="getExamStatus(exam).includes('Failed')"
+                               [class.status-available]="getExamStatus(exam).includes('Available')">
+                        {{ getExamStatus(exam) }}
+                      </mat-chip>
+                    </mat-card-header>
+
+                    <mat-card-content>
+                      <p class="exam-description">{{ exam.description }}</p>
+
+                      <div class="exam-details">
+                        <div class="detail-item">
+                          <mat-icon>schedule</mat-icon>
+                          <span>{{ formatDuration(exam.duration) }}</span>
+                        </div>
+                        <div class="detail-item">
+                          <mat-icon>help_outline</mat-icon>
+                          <span>{{ exam.questions.length || 0 }} questions</span>
+                        </div>
+                        <div class="detail-item">
+                          <mat-icon>date_range</mat-icon>
+                          <span>{{ exam.createdAt | date:'short' }}</span>
+                        </div>
+                      </div>
+
+                      @if (getExamStatus(exam) === 'completed') {
+                        <div class="exam-result">
+                          @if (getResultForExam(exam._id); as result) {
+                            <div class="result-summary">
+                              <div class="result-score" [class]="getScoreColor(result.percentage)">
+                                <span class="score-value">{{ result.percentage }}%</span>
+                                <span class="score-grade">{{ getGradeFromScore(result.percentage) }}</span>
+                                <span class="score-details">{{ result.score }}/{{ result.totalMarks }}</span>
+                              </div>
+                              <div class="result-date">
+                                Completed {{ getTimeAgo(result.submittedAt) }}
+                              </div>
+                            </div>
+                          }
+                        </div>
+                      }
+                    </mat-card-content>
+
+                    <mat-card-actions class="exam-actions">
+                      @if (canTakeExam(exam)) {
+                        <button
+                          mat-raised-button
+                          [color]="getExamButtonText(exam) === 'Retry Exam' ? 'accent' : 'primary'"
+                          (click)="onTakeExam(exam)"
+                          [disabled]="loadingExam">
+                          <mat-icon>{{ getExamButtonText(exam) === 'Retry Exam' ? 'refresh' : 'play_arrow' }}</mat-icon>
+                          {{ getExamButtonText(exam) }}
+                        </button>
+                      } @else {
+                        <button mat-button color="accent" disabled>
+                          <mat-icon>check_circle</mat-icon>
+                          Completed
+                        </button>
+                        <button mat-button (click)="setActiveTab('results')">
+                          <mat-icon>visibility</mat-icon>
+                          View Result
+                        </button>
+                      }
+                    </mat-card-actions>
+                  </mat-card>
+                }
+              </div>
+            } @else {
+              <div class="empty-state">
+                <div class="empty-icon">
+                  <mat-icon>quiz</mat-icon>
+                </div>
+                <h3 class="empty-title">No Exams Found</h3>
+                <p class="empty-description">
+                  @if (searchTerm) {
+                    No exams match your search criteria. Try different keywords.
+                  } @else {
+                    No exams are currently available. Check back later!
+                  }
+                </p>
+              </div>
+            }
+          </div>
+        </ng-template>
+      </mat-tab>
+
+      <!-- Results Tab -->
+      <mat-tab label="Results">
+        <ng-template matTabContent>
+          <div class="tab-content results-tab">
+            <div class="tab-header">
+              <h2 class="tab-title">
+                <mat-icon>assessment</mat-icon>
+                Exam Results
+              </h2>
+              <p class="tab-description">View your exam performance and progress</p>
+            </div>
+
+            @if (myResults.length > 0) {
+              <!-- Results Summary -->
+              <div class="results-summary">
+                <mat-card class="summary-card">
+                  <mat-card-header>
+                    <div mat-card-avatar class="card-avatar success">
+                      <mat-icon>trending_up</mat-icon>
+                    </div>
+                    <mat-card-title>Performance Summary</mat-card-title>
+                    <mat-card-subtitle>Your overall exam statistics</mat-card-subtitle>
+                  </mat-card-header>
+
+                  <mat-card-content>
+                    <div class="summary-stats">
+                      <div class="summary-stat">
+                        <div class="stat-value">{{ stats.averageScore }}%</div>
+                        <div class="stat-label">Average Score</div>
+                      </div>
+                      <div class="summary-stat">
+                        <div class="stat-value">{{ stats.bestScore }}%</div>
+                        <div class="stat-label">Best Score</div>
+                      </div>
+                      <div class="summary-stat">
+                        <div class="stat-value">{{ stats.completedExams }}</div>
+                        <div class="stat-label">Exams Taken</div>
+                      </div>
+                      <div class="summary-stat">
+                        <div class="stat-value">{{ formatDuration(stats.totalTimeSpent) }}</div>
+                        <div class="stat-label">Time Spent</div>
+                      </div>
+                    </div>
+                  </mat-card-content>
+                </mat-card>
+              </div>
+
+              <!-- Results List -->
+              <div class="results-list">
+                @for (result of myResults; track result._id) {
+                  <mat-card class="result-card">
+                    <mat-card-header>
+                      <div mat-card-avatar [class]="'result-avatar ' + getScoreColor(result.score)">
+                        <span class="grade-text">{{ getGradeFromScore(result.score) }}</span>
+                      </div>
+                      <mat-card-title class="result-exam-title">
+                        {{ result.examId.title || 'Exam' }}
+                      </mat-card-title>
+                      <mat-card-subtitle class="result-date">
+                        Completed {{ getTimeAgo(result.submittedAt) }}
+                      </mat-card-subtitle>
+                    </mat-card-header>
+
+                    <mat-card-content>
+                      <div class="result-details">
+                        <div class="score-section">
+                          <div class="score-display" [class]="getScoreColor(result.percentage)">
+                            <div class="score-percentage">{{ result.percentage }}%</div>
+                            <div class="score-grade">Grade: {{ getGradeFromScore(result.percentage) }}</div>
+                            <div class="score-marks">{{ result.score }}/{{ result.totalMarks }} marks</div>
+                          </div>
+                        </div>
+
+                        <div class="result-stats">
+                          <div class="result-stat">
+                            <mat-icon>assignment</mat-icon>
+                            <span>{{ result.answers.length }} questions answered</span>
+                          </div>
+                          <div class="result-stat">
+                            <mat-icon>schedule</mat-icon>
+                            <span>{{ result.submittedAt | date:'medium' }}</span>
+                          </div>
+                        </div>
+
+                        <!-- Progress Bar -->
+                        <div class="score-progress">
+                          <div class="progress-label">
+                            <span>Score Progress</span>
+                            <span>{{ result.percentage }}%</span>
+                          </div>
+                          <mat-progress-bar
+                            mode="determinate"
+                            [value]="result.percentage"
+                            [color]="result.percentage >= 80 ? 'primary' : result.percentage >= 60 ? 'accent' : 'warn'">
+                          </mat-progress-bar>
+                        </div>
+                      </div>
+                    </mat-card-content>
+
+                    <mat-card-actions>
+                      <button mat-button color="primary">
+                        <mat-icon>visibility</mat-icon>
+                        View Details
+                      </button>
+                      <button mat-button>
+                        <mat-icon>file_download</mat-icon>
+                        Download Certificate
+                      </button>
+                    </mat-card-actions>
+                  </mat-card>
+                }
+              </div>
+            } @else {
+              <div class="empty-state">
+                <div class="empty-icon">
+                  <mat-icon>assessment</mat-icon>
+                </div>
+                <h3 class="empty-title">No Results Yet</h3>
+                <p class="empty-description">
+                  You haven't completed any exams yet. Start taking exams to see your results here!
+                </p>
+                <button mat-raised-button color="primary" (click)="setActiveTab('exams')">
+                  <mat-icon>quiz</mat-icon>
+                  Browse Exams
+                </button>
+              </div>
+            }
+          </div>
+        </ng-template>
+      </mat-tab>
+
+      <!-- Profile Tab -->
+      <mat-tab label="Profile">
+        <ng-template matTabContent>
+          <div class="tab-content profile-tab">
+            <div class="tab-header">
+              <h2 class="tab-title">
+                <mat-icon>person</mat-icon>
+                Student Profile
+              </h2>
+              <p class="tab-description">Manage your account and preferences</p>
+            </div>
+
+            <div class="profile-content">
+              <mat-card class="profile-card">
+                <mat-card-header>
+                  <div mat-card-avatar class="profile-avatar">
+                    <mat-icon>account_circle</mat-icon>
+                  </div>
+                  <mat-card-title>{{ currentUser?.username || 'Student' }}</mat-card-title>
+                  <mat-card-subtitle>{{ currentUser?.email || 'student@example.com' }}</mat-card-subtitle>
+                </mat-card-header>
+
+                <mat-card-content>
+                  <div class="profile-stats">
+                    <div class="profile-stat">
+                      <mat-icon>school</mat-icon>
+                      <div class="stat-info">
+                        <div class="stat-value">Student</div>
+                        <div class="stat-label">Role</div>
+                      </div>
+                    </div>
+                    <div class="profile-stat">
+                      <mat-icon>date_range</mat-icon>
+                      <div class="stat-info">
+                        <div class="stat-value">{{ currentUser?.createdAt | date:'mediumDate' }}</div>
+                        <div class="stat-label">Member Since</div>
+                      </div>
+                    </div>
+                    <div class="profile-stat">
+                      <mat-icon>trending_up</mat-icon>
+                      <div class="stat-info">
+                        <div class="stat-value">{{ stats.averageScore }}%</div>
+                        <div class="stat-label">Average Score</div>
+                      </div>
+                    </div>
+                  </div>
+                </mat-card-content>
+
+                <mat-card-actions>
+                  <button mat-button color="primary">
+                    <mat-icon>edit</mat-icon>
+                    Edit Profile
+                  </button>
+                  <button mat-button>
+                    <mat-icon>settings</mat-icon>
+                    Settings
+                  </button>
+                  <button mat-button color="warn" (click)="logout()">
+                    <mat-icon>logout</mat-icon>
+                    Logout
+                  </button>
+                </mat-card-actions>
+              </mat-card>
+            </div>
+          </div>
+        </ng-template>
+      </mat-tab>
+    </mat-tab-group>
+  </main>
+
+  <!-- Exam Taking Modal/Overlay -->
+  @if (selectedExam && questions.length > 0) {
+    <div class="exam-overlay">
+      <app-exam-taking
+        [exam]="selectedExam"
+        [questions]="questions"
+        [answers]="answers"
+        [loading]="loadingExam"
+        (submitExam)="onSubmitExam($event)"
+        (cancelExam)="onCancelExam()">
+      </app-exam-taking>
+    </div>
+  }
+
+  <!-- Result Modal/Overlay -->
+  @if (result) {
+    <div class="result-overlay">
+      <app-result-view
+        [result]="result"
+        [percentage]="percentage"
+        (back)="onBackFromResult()">
+      </app-result-view>
+    </div>
+  }
+
+  <!-- Loading Overlay -->
+  @if (loadingExam) {
+    <div class="loading-overlay">
+      <div class="loading-content">
+        <mat-spinner diameter="60"></mat-spinner>
+        <p>Loading exam...</p>
+      </div>
+    </div>
+  }
+</div>
