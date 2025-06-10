@@ -1,1 +1,11 @@
-<p>result-view works!</p>
+<div *ngIf="result" class="result-view-root">
+  <mat-card>
+    <mat-card-title>Exam Result</mat-card-title>
+    <mat-card-content>
+      <p><strong>Score:</strong> {{ result.score }}</p>
+      <p><strong>Percentage:</strong> {{ percentage | number:'1.0-2' }}%</p>
+      <p><strong>Submitted At:</strong> {{ result.submittedAt | date:'medium' }}</p>
+      <button mat-raised-button color="primary" (click)="onBack()">Back to Exams</button>
+    </mat-card-content>
+  </mat-card>
+</div>

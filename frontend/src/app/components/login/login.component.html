@@ -1,1 +1,156 @@
-<p>login works!</p>
+<div class="login-bg">
+  <!-- Background Animation Elements -->
+  <div class="bg-animation">
+    <div class="floating-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+      <div class="shape shape-4"></div>
+      <div class="shape shape-5"></div>
+    </div>
+  </div>
+
+  <div class="login-center">
+    <div class="login-container animate-fade-in">
+      <!-- Logo/Brand Section -->
+      <div class="brand-section">
+        <div class="brand-icon">
+          <mat-icon class="brand-logo">school</mat-icon>
+        </div>
+        <h1 class="brand-title">ExamSystem</h1>
+        <p class="brand-subtitle">Welcome back! Please sign in to your account</p>
+      </div>
+
+      <!-- Login Card -->
+      <mat-card class="login-card glass-card animate-scale-in">
+        <mat-card-header class="login-header">
+          <mat-card-title class="login-title">
+            <mat-icon class="title-icon">login</mat-icon>
+            Sign In
+          </mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content class="login-content">
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" autocomplete="off" novalidate>
+            <!-- Email Field -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Email Address</mat-label>
+              <input
+                matInput
+                formControlName="email"
+                type="email"
+                required
+                autocomplete="email"
+                aria-describedby="email-error"
+                [attr.aria-invalid]="email?.invalid && email?.touched">
+              <mat-icon matPrefix>email</mat-icon>
+              <mat-error id="email-error">
+                @if (email?.hasError('required')) {
+                  Email is required
+                }
+                @if (email?.hasError('email')) {
+                  Please enter a valid email address
+                }
+              </mat-error>
+            </mat-form-field>
+
+            <!-- Password Field -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Password</mat-label>
+              <input
+                matInput
+                formControlName="password"
+                [type]="hidePassword ? 'password' : 'text'"
+                required
+                autocomplete="current-password"
+                aria-describedby="password-error"
+                [attr.aria-invalid]="password?.invalid && password?.touched">
+              <mat-icon matPrefix>lock</mat-icon>
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                (click)="hidePassword = !hidePassword"
+                [attr.aria-label]="hidePassword ? 'Show password' : 'Hide password'"
+                [attr.aria-pressed]="!hidePassword">
+                <mat-icon>{{hidePassword ? 'visibility' : 'visibility_off'}}</mat-icon>
+              </button>
+              <mat-error id="password-error">
+                @if (password?.hasError('required')) {
+                  Password is required
+                }
+                @if (password?.hasError('minlength')) {
+                  Password must be at least 6 characters long
+                }
+              </mat-error>
+            </mat-form-field>
+
+            <!-- Remember Me & Forgot Password -->
+            <div class="login-options">
+              <mat-checkbox class="remember-me">Remember me</mat-checkbox>
+              <a href="#" class="forgot-password">Forgot password?</a>
+            </div>
+
+            <!-- Submit Button -->
+            <button
+              mat-raised-button
+              class="login-btn btn-gradient-primary"
+              type="submit"
+              [disabled]="loginForm.invalid || loading"
+              [attr.aria-busy]="loading">
+              @if (!loading) {
+                <ng-container>
+                  <mat-icon>login</mat-icon>
+                  <span>Sign In</span>
+                </ng-container>
+              }
+              @if (loading) {
+                <ng-container>
+                  <mat-progress-spinner
+                    diameter="20"
+                    mode="indeterminate"
+                    color="accent"
+                    aria-label="Signing in...">
+                  </mat-progress-spinner>
+                  <span>Signing in...</span>
+                </ng-container>
+              }
+            </button>
+
+            <!-- Divider -->
+            <div class="divider">
+              <span class="divider-text">or</span>
+            </div>
+
+            <!-- Register Link -->
+            <div class="register-section">
+              <p class="register-text">Don't have an account?</p>
+              <button
+                mat-button
+                class="register-btn"
+                type="button"
+                routerLink="/register">
+                <mat-icon>person_add</mat-icon>
+                Create Account
+              </button>
+            </div>
+          </form>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  @if (loading) {
+    <div class="loading-overlay" role="status" aria-live="polite">
+      <div class="loading-content">
+        <mat-progress-spinner
+          diameter="60"
+          mode="indeterminate"
+          color="primary">
+        </mat-progress-spinner>
+        <p class="loading-text">Signing you in...</p>
+      </div>
+    </div>
+  }
+</div>

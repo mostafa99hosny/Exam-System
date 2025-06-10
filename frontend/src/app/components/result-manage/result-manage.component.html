@@ -1,1 +1,36 @@
-<p>result-manage works!</p>
+<div class="result-manage-root">
+  <mat-card>
+    <mat-card-title>Manage Results</mat-card-title>
+    <mat-card-content>
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Search by student or exam</mat-label>
+        <input matInput [(ngModel)]="searchTerm" (ngModelChange)="filterResults()" placeholder="Type to search...">
+        <button mat-icon-button matSuffix *ngIf="searchTerm" (click)="searchTerm=''; filterResults();"><mat-icon>close</mat-icon></button>
+      </mat-form-field>
+      <button mat-raised-button color="primary" (click)="exportCSV()">Export CSV</button>
+      <table mat-table [dataSource]="filteredResults" class="mat-elevation-z1">
+        <ng-container matColumnDef="student">
+          <th mat-header-cell *matHeaderCellDef>Student</th>
+          <td mat-cell *matCellDef="let r">{{ r.studentId.username }}</td>
+        </ng-container>
+        <ng-container matColumnDef="exam">
+          <th mat-header-cell *matHeaderCellDef>Exam</th>
+          <td mat-cell *matCellDef="let r">{{ r.examId.title }}</td>
+        </ng-container>
+        <ng-container matColumnDef="score">
+          <th mat-header-cell *matHeaderCellDef>Score</th>
+          <td mat-cell *matCellDef="let r">{{ r.score }}</td>
+        </ng-container>
+        <ng-container matColumnDef="submittedAt">
+          <th mat-header-cell *matHeaderCellDef>Submitted At</th>
+          <td mat-cell *matCellDef="let r">{{ r.submittedAt | date:'medium' }}</td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="['student', 'exam', 'score', 'submittedAt']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['student', 'exam', 'score', 'submittedAt']"></tr>
+      </table>
+      <div *ngIf="loading" class="loading-spinner">
+        <mat-progress-spinner diameter="32" color="primary" mode="indeterminate"></mat-progress-spinner>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

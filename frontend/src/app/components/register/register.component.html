@@ -1,1 +1,244 @@
-<p>register works!</p>
+<div class="register-bg">
+  <!-- Background Animation Elements -->
+  <div class="bg-animation">
+    <div class="floating-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+      <div class="shape shape-4"></div>
+      <div class="shape shape-5"></div>
+      <div class="shape shape-6"></div>
+    </div>
+  </div>
+
+  <div class="register-center">
+    <div class="register-container animate-fade-in">
+      <!-- Brand Section -->
+      <div class="brand-section">
+        <div class="brand-icon">
+          <mat-icon class="brand-logo">school</mat-icon>
+        </div>
+        <h1 class="brand-title">Join ExamSystem</h1>
+        <p class="brand-subtitle">Create your account and start your learning journey</p>
+      </div>
+
+      <!-- Register Card -->
+      <mat-card class="register-card glass-card animate-scale-in">
+        <mat-card-header class="register-header">
+          <mat-card-title class="register-title">
+            <mat-icon class="title-icon">person_add</mat-icon>
+            Create Account
+          </mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content class="register-content">
+          <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" autocomplete="off" novalidate>
+            <!-- Username Field -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Username</mat-label>
+              <input
+                matInput
+                formControlName="username"
+                required
+                autocomplete="username"
+                aria-describedby="username-error"
+                [attr.aria-invalid]="username?.invalid && username?.touched">
+              <mat-icon matPrefix>person</mat-icon>
+              <mat-error id="username-error">
+                @if (username?.hasError('required')) {
+                  Username is required
+                }
+                @if (username?.hasError('minlength')) {
+                  Username must be at least 3 characters long
+                }
+                @if (username?.hasError('maxlength')) {
+                  Username cannot exceed 20 characters
+                }
+              </mat-error>
+            </mat-form-field>
+
+            <!-- Email Field -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Email Address</mat-label>
+              <input
+                matInput
+                formControlName="email"
+                type="email"
+                required
+                autocomplete="email"
+                aria-describedby="email-error"
+                [attr.aria-invalid]="email?.invalid && email?.touched">
+              <mat-icon matPrefix>email</mat-icon>
+              <mat-error id="email-error">
+                @if (email?.hasError('required')) {
+                  Email is required
+                }
+                @if (email?.hasError('email')) {
+                  Please enter a valid email address
+                }
+              </mat-error>
+            </mat-form-field>
+
+            <!-- Role Selection -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Account Type</mat-label>
+              <mat-select formControlName="role" required>
+                <mat-option value="student">
+                  <mat-icon>school</mat-icon>
+                  Student
+                </mat-option>
+                <mat-option value="admin">
+                  <mat-icon>admin_panel_settings</mat-icon>
+                  Administrator
+                </mat-option>
+              </mat-select>
+              <mat-icon matPrefix>badge</mat-icon>
+              <mat-error>
+                @if (role?.hasError('required')) {
+                  Please select an account type
+                }
+              </mat-error>
+            </mat-form-field>
+
+            <!-- Password Field -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Password</mat-label>
+              <input
+                matInput
+                formControlName="password"
+                [type]="hidePassword ? 'password' : 'text'"
+                required
+                autocomplete="new-password"
+                aria-describedby="password-error password-help"
+                [attr.aria-invalid]="password?.invalid && password?.touched">
+              <mat-icon matPrefix>lock</mat-icon>
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                (click)="hidePassword = !hidePassword"
+                [attr.aria-label]="hidePassword ? 'Show password' : 'Hide password'"
+                [attr.aria-pressed]="!hidePassword">
+                <mat-icon>{{hidePassword ? 'visibility' : 'visibility_off'}}</mat-icon>
+              </button>
+              <mat-hint id="password-help">Must contain uppercase, lowercase, and number</mat-hint>
+              <mat-error id="password-error">
+                @if (password?.hasError('required')) {
+                  Password is required
+                }
+                @if (password?.hasError('minlength')) {
+                  Password must be at least 6 characters long
+                }
+                @if (password?.hasError('pattern')) {
+                  Password must contain uppercase, lowercase, and number
+                }
+              </mat-error>
+            </mat-form-field>
+
+            <!-- Confirm Password Field -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Confirm Password</mat-label>
+              <input
+                matInput
+                formControlName="confirmPassword"
+                [type]="hideConfirmPassword ? 'password' : 'text'"
+                required
+                autocomplete="new-password"
+                aria-describedby="confirm-password-error"
+                [attr.aria-invalid]="confirmPassword?.invalid && confirmPassword?.touched">
+              <mat-icon matPrefix>lock_outline</mat-icon>
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                (click)="hideConfirmPassword = !hideConfirmPassword"
+                [attr.aria-label]="hideConfirmPassword ? 'Show password' : 'Hide password'"
+                [attr.aria-pressed]="!hideConfirmPassword">
+                <mat-icon>{{hideConfirmPassword ? 'visibility' : 'visibility_off'}}</mat-icon>
+              </button>
+              <mat-error id="confirm-password-error">
+                @if (confirmPassword?.hasError('required')) {
+                  Please confirm your password
+                }
+                @if (confirmPassword?.hasError('passwordMismatch')) {
+                  Passwords do not match
+                }
+              </mat-error>
+            </mat-form-field>
+
+            <!-- Terms and Conditions -->
+            <div class="terms-section">
+              <mat-checkbox formControlName="agreeToTerms" required>
+                I agree to the
+                <a href="#" class="terms-link">Terms of Service</a>
+                and
+                <a href="#" class="terms-link">Privacy Policy</a>
+              </mat-checkbox>
+              <mat-error *ngIf="agreeToTerms?.hasError('required') && agreeToTerms?.touched">
+                You must agree to the terms and conditions
+              </mat-error>
+            </div>
+
+            <!-- Submit Button -->
+            <button
+              mat-raised-button
+              class="register-btn btn-gradient-primary"
+              type="submit"
+              [disabled]="registerForm.invalid || loading"
+              [attr.aria-busy]="loading">
+              @if (!loading) {
+                <ng-container>
+                  <mat-icon>person_add</mat-icon>
+                  <span>Create Account</span>
+                </ng-container>
+              }
+              @if (loading) {
+                <ng-container>
+                  <mat-progress-spinner
+                    diameter="20"
+                    mode="indeterminate"
+                    color="accent"
+                    aria-label="Creating account...">
+                  </mat-progress-spinner>
+                  <span>Creating account...</span>
+                </ng-container>
+              }
+            </button>
+
+            <!-- Divider -->
+            <div class="divider">
+              <span class="divider-text">or</span>
+            </div>
+
+            <!-- Login Link -->
+            <div class="login-section">
+              <p class="login-text">Already have an account?</p>
+              <button
+                mat-button
+                class="login-btn"
+                type="button"
+                routerLink="/login">
+                <mat-icon>login</mat-icon>
+                Sign In
+              </button>
+            </div>
+          </form>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  @if (loading) {
+    <div class="loading-overlay" role="status" aria-live="polite">
+      <div class="loading-content">
+        <mat-progress-spinner
+          diameter="60"
+          mode="indeterminate"
+          color="primary">
+        </mat-progress-spinner>
+        <p class="loading-text">Creating your account...</p>
+      </div>
+    </div>
+  }
+</div>
