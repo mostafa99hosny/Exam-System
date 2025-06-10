@@ -1,4 +1,3 @@
-// Exam model for MongoDB using Mongoose
 const mongoose = require('mongoose');
 
 const examSchema = new mongoose.Schema({
@@ -10,4 +9,4 @@ const examSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now },
 });
 
-module.exports = mongoose.model('Exam', examSchema); 
+module.exports = mongoose.model('Exam', examSchema);
