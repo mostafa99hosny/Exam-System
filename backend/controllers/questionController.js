@@ -43,10 +43,11 @@ exports.deleteQuestion = async (req, res) => {
         const exam = await Exam.findById(question.examId);
         if (!exam || exam.createdBy.toString() !== req.user.id) return res.status(401).json({ msg: 'Not authorized' });
 
-        await question.remove();
+        await Question.findByIdAndDelete(req.params.id);
         await Exam.findByIdAndUpdate(question.examId, { $pull: { questions: question._id } });
         res.json({ msg: 'Question removed' });
     } catch (err) {
+        console.error('Error deleting question:', err);
         res.status(500).send('Server error');
     }
 };
