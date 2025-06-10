@@ -1,0 +1,29 @@
+
+.question-manage-root {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px 0;
+}
+.question-form {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 18px;
+}
+.options-row {
+  display: flex;
+  gap: 10px;
+}
+.question-list-card {
+  margin-top: 18px;
+}
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80px;
+}

@@ -1,1 +1,70 @@
-<p>exam-manage works!</p>
+<div class="exam-manage-root">
+  <mat-card>
+    <mat-card-title>Manage Exams</mat-card-title>
+    <mat-card-content>
+      <form *ngIf="!editingExam" (ngSubmit)="createExam()" class="exam-form">
+        <mat-form-field appearance="outline">
+          <mat-label>Title</mat-label>
+          <input matInput [(ngModel)]="newExam.title" name="title" required>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Description</mat-label>
+          <input matInput [(ngModel)]="newExam.description" name="description" required>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Duration (min)</mat-label>
+          <input matInput type="number" [(ngModel)]="newExam.duration" name="duration" required min="1">
+        </mat-form-field>
+        <button mat-raised-button color="primary" type="submit">Add Exam</button>
+      </form>
+      <form *ngIf="editingExam" (ngSubmit)="updateExam()" class="exam-form">
+        <mat-form-field appearance="outline">
+          <mat-label>Title</mat-label>
+          <input matInput [(ngModel)]="editingExam.title" name="editTitle" required>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Description</mat-label>
+          <input matInput [(ngModel)]="editingExam.description" name="editDescription" required>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Duration (min)</mat-label>
+          <input matInput type="number" [(ngModel)]="editingExam.duration" name="editDuration" required min="1">
+        </mat-form-field>
+        <button mat-raised-button color="accent" type="submit">Update</button>
+        <button mat-button type="button" (click)="cancelEdit()">Cancel</button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="exam-list-card">
+    <mat-card-title>All Exams</mat-card-title>
+    <mat-card-content>
+      <table mat-table [dataSource]="exams" class="mat-elevation-z1">
+        <ng-container matColumnDef="title">
+          <th mat-header-cell *matHeaderCellDef>Title</th>
+          <td mat-cell *matCellDef="let exam">{{ exam.title }}</td>
+        </ng-container>
+        <ng-container matColumnDef="description">
+          <th mat-header-cell *matHeaderCellDef>Description</th>
+          <td mat-cell *matCellDef="let exam">{{ exam.description }}</td>
+        </ng-container>
+        <ng-container matColumnDef="duration">
+          <th mat-header-cell *matHeaderCellDef>Duration</th>
+          <td mat-cell *matCellDef="let exam">{{ exam.duration }} min</td>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let exam">
+            <button mat-icon-button color="primary" (click)="startEdit(exam)"><mat-icon>edit</mat-icon></button>
+            <button mat-icon-button color="warn" (click)="deleteExam(exam._id)"><mat-icon>delete</mat-icon></button>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="['title', 'description', 'duration', 'actions']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['title', 'description', 'duration', 'actions']"></tr>
+      </table>
+      <div *ngIf="loading" class="loading-spinner">
+        <mat-progress-spinner diameter="32" color="primary" mode="indeterminate"></mat-progress-spinner>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

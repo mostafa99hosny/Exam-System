@@ -1,1 +1,28 @@
-<p>exam-list works!</p>
+<div class="exam-list-root">
+  <ng-container *ngIf="!loading; else loadingTpl">
+    <ng-container *ngIf="exams.length > 0; else noExamsTpl">
+      <mat-card *ngFor="let exam of exams" class="exam-card animate__animated animate__fadeInUp">
+        <mat-card-header>
+          <mat-card-title>{{ exam.title }}</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p>{{ exam.description }}</p>
+          <p><strong>Duration:</strong> {{ exam.duration }} min</p>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-raised-button color="primary" (click)="onTakeExam(exam)" [disabled]="!canTakeExam(exam)">
+            {{ canTakeExam(exam) ? 'Take Exam' : 'Completed' }}
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </ng-container>
+  </ng-container>
+  <ng-template #noExamsTpl>
+    <div class="no-exams">No exams available.</div>
+  </ng-template>
+  <ng-template #loadingTpl>
+    <div class="loading-spinner">
+      <mat-progress-spinner diameter="40" color="primary" mode="indeterminate"></mat-progress-spinner>
+    </div>
+  </ng-template>
+</div>
