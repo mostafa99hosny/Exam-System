@@ -1,1 +1,1081 @@
-<p>admin-dashboard works!</p>
+<div class="admin-dashboard">
+  <!-- Enhanced Header with Navigation -->
+  <header class="dashboard-header">
+    <div class="header-container">
+      <div class="header-brand">
+        <mat-icon class="brand-icon">admin_panel_settings</mat-icon>
+        <div class="brand-info">
+          <h1 class="brand-title">Admin Dashboard</h1>
+          <p class="brand-subtitle">Comprehensive Exam Management System</p>
+        </div>
+      </div>
+
+      <nav class="header-nav">
+        <button
+          mat-button
+          [class.active]="activeTab === 'overview'"
+          (click)="setActiveTab('overview')"
+          class="nav-btn">
+          <mat-icon>dashboard</mat-icon>
+          Overview
+        </button>
+        <button
+          mat-button
+          [class.active]="activeTab === 'exams'"
+          (click)="setActiveTab('exams')"
+          class="nav-btn">
+          <mat-icon>quiz</mat-icon>
+          Exams
+        </button>
+        <button
+          mat-button
+          [class.active]="activeTab === 'questions'"
+          (click)="setActiveTab('questions')"
+          class="nav-btn">
+          <mat-icon>help_outline</mat-icon>
+          Questions
+        </button>
+        <button
+          mat-button
+          [class.active]="activeTab === 'results'"
+          (click)="setActiveTab('results')"
+          class="nav-btn">
+          <mat-icon>assessment</mat-icon>
+          Results
+        </button>
+        <button
+          mat-button
+          [class.active]="activeTab === 'users'"
+          (click)="setActiveTab('users')"
+          class="nav-btn">
+          <mat-icon>people</mat-icon>
+          Users
+        </button>
+        <button
+          mat-button
+          [class.active]="activeTab === 'exam-resets'"
+          (click)="setActiveTab('exam-resets')"
+          class="nav-btn">
+          <mat-icon>refresh</mat-icon>
+          Exam Resets
+        </button>
+      </nav>
+
+      <div class="header-actions">
+        <button mat-icon-button class="action-btn" [matMenuTriggerFor]="notificationMenu">
+          <mat-icon [matBadge]="notifications.length" matBadgeColor="warn">notifications</mat-icon>
+        </button>
+        <mat-menu #notificationMenu="matMenu" class="notification-menu">
+          <div class="menu-header">
+            <h3>Notifications</h3>
+            <button mat-icon-button (click)="clearNotifications()">
+              <mat-icon>clear_all</mat-icon>
+            </button>
+          </div>
+          <mat-divider></mat-divider>
+          @for (notification of notifications; track notification.id) {
+            <button mat-menu-item class="notification-item">
+              <mat-icon [class]="notification.type">{{ notification.icon }}</mat-icon>
+              <div class="notification-content">
+                <span class="notification-title">{{ notification.title }}</span>
+                <span class="notification-time">{{ notification.time | date:'short' }}</span>
+              </div>
+            </button>
+          }
+          @if (notifications.length === 0) {
+            <div class="no-notifications">
+              <mat-icon>notifications_none</mat-icon>
+              <span>No new notifications</span>
+            </div>
+          }
+        </mat-menu>
+
+        <button mat-icon-button class="action-btn" [matMenuTriggerFor]="userMenu">
+          <mat-icon>account_circle</mat-icon>
+        </button>
+        <mat-menu #userMenu="matMenu" class="user-menu">
+          <div class="user-info">
+            <mat-icon class="user-avatar">account_circle</mat-icon>
+            <div class="user-details">
+              <span class="user-name">Admin User</span>
+              <span class="user-role">Administrator</span>
+            </div>
+          </div>
+          <mat-divider></mat-divider>
+          <button mat-menu-item>
+            <mat-icon>person</mat-icon>
+            <span>Profile Settings</span>
+          </button>
+          <button mat-menu-item>
+            <mat-icon>settings</mat-icon>
+            <span>System Settings</span>
+          </button>
+          <button mat-menu-item>
+            <mat-icon>help</mat-icon>
+            <span>Help & Support</span>
+          </button>
+          <mat-divider></mat-divider>
+          <button mat-menu-item (click)="logout()" class="logout-btn">
+            <mat-icon>logout</mat-icon>
+            <span>Sign Out</span>
+          </button>
+        </mat-menu>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="dashboard-main">
+    <!-- Overview Tab -->
+    <div *ngIf="activeTab === 'overview'" class="tab-content overview-tab">
+      <!-- Enhanced Statistics Cards -->
+      <section class="stats-section">
+        <div class="stats-grid">
+          <mat-card class="stat-card primary-card" [class.loading]="loading">
+            <div class="stat-content">
+              <div class="stat-icon-wrapper">
+                <mat-icon class="stat-icon">quiz</mat-icon>
+              </div>
+              <div class="stat-details">
+                <h3 class="stat-number">{{ stats.totalExams }}</h3>
+                <p class="stat-label">Total Exams</p>
+                <span class="stat-trend positive">
+                  <mat-icon>trending_up</mat-icon>
+                  +12% this month
+                </span>
+              </div>
+            </div>
+            <div class="stat-progress">
+              <mat-progress-bar mode="determinate" [value]="75"></mat-progress-bar>
+            </div>
+          </mat-card>
+
+          <mat-card class="stat-card success-card" [class.loading]="loading">
+            <div class="stat-content">
+              <div class="stat-icon-wrapper">
+                <mat-icon class="stat-icon">help_outline</mat-icon>
+              </div>
+              <div class="stat-details">
+                <h3 class="stat-number">{{ stats.totalQuestions }}</h3>
+                <p class="stat-label">Questions</p>
+                <span class="stat-trend positive">
+                  <mat-icon>trending_up</mat-icon>
+                  +8% this week
+                </span>
+              </div>
+            </div>
+            <div class="stat-progress">
+              <mat-progress-bar mode="determinate" [value]="60"></mat-progress-bar>
+            </div>
+          </mat-card>
+
+          <mat-card class="stat-card warning-card" [class.loading]="loading">
+            <div class="stat-content">
+              <div class="stat-icon-wrapper">
+                <mat-icon class="stat-icon">people</mat-icon>
+              </div>
+              <div class="stat-details">
+                <h3 class="stat-number">{{ stats.totalUsers }}</h3>
+                <p class="stat-label">Active Users</p>
+                <span class="stat-trend positive">
+                  <mat-icon>trending_up</mat-icon>
+                  +5% this month
+                </span>
+              </div>
+            </div>
+            <div class="stat-progress">
+              <mat-progress-bar mode="determinate" [value]="85"></mat-progress-bar>
+            </div>
+          </mat-card>
+
+          <mat-card class="stat-card info-card" [class.loading]="loading">
+            <div class="stat-content">
+              <div class="stat-icon-wrapper">
+                <mat-icon class="stat-icon">assessment</mat-icon>
+              </div>
+              <div class="stat-details">
+                <h3 class="stat-number">{{ stats.totalSubmissions }}</h3>
+                <p class="stat-label">Submissions</p>
+                <span class="stat-trend neutral">
+                  <mat-icon>trending_flat</mat-icon>
+                  No change
+                </span>
+              </div>
+            </div>
+            <div class="stat-progress">
+              <mat-progress-bar mode="determinate" [value]="45"></mat-progress-bar>
+            </div>
+          </mat-card>
+
+          <mat-card class="stat-card accent-card" [class.loading]="loading">
+            <div class="stat-content">
+              <div class="stat-icon-wrapper">
+                <mat-icon class="stat-icon">grade</mat-icon>
+              </div>
+              <div class="stat-details">
+                <h3 class="stat-number">{{ stats.averageScore }}%</h3>
+                <p class="stat-label">Average Score</p>
+                <span class="stat-trend positive">
+                  <mat-icon>trending_up</mat-icon>
+                  +3% improvement
+                </span>
+              </div>
+            </div>
+            <div class="stat-progress">
+              <mat-progress-bar mode="determinate" [value]="stats.averageScore"></mat-progress-bar>
+            </div>
+          </mat-card>
+
+          <mat-card class="stat-card error-card" [class.loading]="loading">
+            <div class="stat-content">
+              <div class="stat-icon-wrapper">
+                <mat-icon class="stat-icon">timeline</mat-icon>
+              </div>
+              <div class="stat-details">
+                <h3 class="stat-number">{{ stats.completionRate }}%</h3>
+                <p class="stat-label">Completion Rate</p>
+                <span class="stat-trend positive">
+                  <mat-icon>trending_up</mat-icon>
+                  +7% this month
+                </span>
+              </div>
+            </div>
+            <div class="stat-progress">
+              <mat-progress-bar mode="determinate" [value]="stats.completionRate"></mat-progress-bar>
+            </div>
+          </mat-card>
+        </div>
+      </section>
+
+      <!-- Quick Actions -->
+      <section class="quick-actions-section">
+        <h2 class="section-title">Quick Actions</h2>
+        <div class="quick-actions-grid">
+          <mat-card class="action-card" (click)="setActiveTab('exams')">
+            <mat-card-content>
+              <mat-icon class="action-icon">add_circle</mat-icon>
+              <h3>Create New Exam</h3>
+              <p>Set up a new examination</p>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="action-card" (click)="setActiveTab('questions')">
+            <mat-card-content>
+              <mat-icon class="action-icon">help_outline</mat-icon>
+              <h3>Add Questions</h3>
+              <p>Create questions for exams</p>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="action-card" (click)="setActiveTab('results')">
+            <mat-card-content>
+              <mat-icon class="action-icon">analytics</mat-icon>
+              <h3>View Analytics</h3>
+              <p>Check exam performance</p>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="action-card" (click)="setActiveTab('users')">
+            <mat-card-content>
+              <mat-icon class="action-icon">person_add</mat-icon>
+              <h3>Manage Users</h3>
+              <p>Add or edit user accounts</p>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="action-card" (click)="setActiveTab('exam-resets')">
+            <mat-card-content>
+              <mat-icon class="action-icon">refresh</mat-icon>
+              <h3>Exam Resets</h3>
+              <p>Manage exam retakes for failed students</p>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </section>
+
+      <!-- Recent Activity -->
+      <section class="recent-activity-section">
+        <h2 class="section-title">Recent Activity</h2>
+        <mat-card class="activity-card">
+          <mat-card-content>
+            <div class="activity-list">
+              @for (notification of notifications.slice(0, 5); track notification.id) {
+                <div class="activity-item">
+                  <mat-icon [class]="notification.type">{{ notification.icon }}</mat-icon>
+                  <div class="activity-content">
+                    <span class="activity-title">{{ notification.title }}</span>
+                    <span class="activity-time">{{ notification.time | date:'short' }}</span>
+                  </div>
+                </div>
+              }
+              @if (notifications.length === 0) {
+                <div class="no-activity">
+                  <mat-icon>inbox</mat-icon>
+                  <span>No recent activity</span>
+                </div>
+              }
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </section>
+    </div>
+
+    <!-- Exams Tab -->
+    <div *ngIf="activeTab === 'exams'" class="tab-content exams-tab">
+      <div class="tab-header">
+        <h2 class="tab-title">
+          <mat-icon>quiz</mat-icon>
+          Exam Management
+        </h2>
+        <p class="tab-description">Create, edit, and manage your examinations</p>
+      </div>
+
+      <div class="content-layout">
+        <!-- Create Exam Section -->
+        <mat-card class="create-card">
+          <mat-card-header>
+            <div mat-card-avatar class="card-avatar primary">
+              <mat-icon>add_circle</mat-icon>
+            </div>
+            <mat-card-title>Create New Exam</mat-card-title>
+            <mat-card-subtitle>Set up a new examination with custom settings</mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content>
+            <form class="exam-form">
+              <div class="form-row">
+                <mat-form-field appearance="outline" class="form-field">
+                  <mat-label>Exam Title</mat-label>
+                  <input
+                    matInput
+                    [(ngModel)]="newExam.title"
+                    name="title"
+                    placeholder="e.g., Mathematics Final Exam"
+                    required>
+                  <mat-icon matPrefix>title</mat-icon>
+                  <mat-hint>Enter a descriptive title for your exam</mat-hint>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="form-field">
+                  <mat-label>Duration (minutes)</mat-label>
+                  <input
+                    matInput
+                    type="number"
+                    [(ngModel)]="newExam.duration"
+                    name="duration"
+                    placeholder="60"
+                    min="1"
+                    max="300"
+                    required>
+                  <mat-icon matPrefix>timer</mat-icon>
+                  <mat-hint>Set exam duration (1-300 minutes)</mat-hint>
+                </mat-form-field>
+              </div>
+
+              <mat-form-field appearance="outline" class="form-field full-width">
+                <mat-label>Description</mat-label>
+                <textarea
+                  matInput
+                  [(ngModel)]="newExam.description"
+                  name="description"
+                  placeholder="Provide detailed instructions and exam overview..."
+                  rows="4"
+                  required></textarea>
+                <mat-icon matPrefix>description</mat-icon>
+                <mat-hint>Provide clear instructions for students</mat-hint>
+              </mat-form-field>
+
+              <div class="form-actions">
+                <button
+                  mat-raised-button
+                  color="primary"
+                  class="create-btn"
+                  (click)="createExam()"
+                  [disabled]="isCreateExamDisabled()">
+                  <mat-icon>add</mat-icon>
+                  Create Exam
+                </button>
+                <button
+                  mat-button
+                  type="button"
+                  (click)="resetExamForm()">
+                  <mat-icon>clear</mat-icon>
+                  Clear Form
+                </button>
+              </div>
+            </form>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Exams List Section -->
+        <mat-card class="list-card">
+          <mat-card-header>
+            <div mat-card-avatar class="card-avatar success">
+              <mat-icon>list</mat-icon>
+            </div>
+            <mat-card-title>Existing Exams ({{ exams.length }})</mat-card-title>
+            <mat-card-subtitle>Manage your created examinations</mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content>
+            @if (exams.length > 0) {
+              <div class="exams-grid">
+                @for (exam of exams; track exam._id) {
+                  <mat-card class="exam-card" [class.editing]="editingExam?._id === exam._id">
+                    <mat-card-header>
+                      <div mat-card-avatar class="exam-avatar">
+                        <mat-icon>quiz</mat-icon>
+                      </div>
+                      <mat-card-title class="exam-title">{{ exam.title }}</mat-card-title>
+                      <mat-card-subtitle class="exam-duration">
+                        <mat-icon>timer</mat-icon>
+                        {{ exam.duration }} minutes
+                      </mat-card-subtitle>
+                    </mat-card-header>
+
+                    <mat-card-content>
+                      <p class="exam-description">{{ exam.description }}</p>
+                      <div class="exam-metadata">
+                        <div class="metadata-item">
+                          <mat-icon>date_range</mat-icon>
+                          <span>Created: {{ exam.createdAt | date:'short' }}</span>
+                        </div>
+                        <div class="metadata-item">
+                          <mat-icon>help_outline</mat-icon>
+                          <span>Questions: {{ getQuestionCount(exam._id) }}</span>
+                        </div>
+                        <div class="metadata-item">
+                          <mat-icon>assessment</mat-icon>
+                          <span>Submissions: {{ getSubmissionCount(exam._id) }}</span>
+                        </div>
+                      </div>
+                    </mat-card-content>
+
+                    <mat-card-actions class="exam-actions">
+                      <button
+                        mat-button
+                        color="primary"
+                        (click)="startEditingExam(exam)"
+                        matTooltip="Edit exam details">
+                        <mat-icon>edit</mat-icon>
+                        Edit
+                      </button>
+                      <button
+                        mat-button
+                        color="accent"
+                        (click)="setActiveTab('questions'); loadQuestions(exam._id)"
+                        matTooltip="Manage questions">
+                        <mat-icon>help_outline</mat-icon>
+                        Questions
+                      </button>
+                      <button
+                        mat-button
+                        color="warn"
+                        (click)="deleteExam(exam._id)"
+                        matTooltip="Delete exam">
+                        <mat-icon>delete</mat-icon>
+                        Delete
+                      </button>
+                    </mat-card-actions>
+                  </mat-card>
+                }
+              </div>
+            } @else {
+              <div class="empty-state">
+                <div class="empty-icon">
+                  <mat-icon>quiz</mat-icon>
+                </div>
+                <h3 class="empty-title">No Exams Created Yet</h3>
+                <p class="empty-description">Create your first exam to get started with the examination system</p>
+                <button
+                  mat-raised-button
+                  color="primary"
+                  (click)="setActiveTab('exams')"
+                  class="empty-action">
+                  <mat-icon>add</mat-icon>
+                  Create First Exam
+                </button>
+              </div>
+            }
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Edit Exam Section -->
+        @if (editingExam) {
+          <mat-card class="edit-card">
+            <mat-card-header>
+              <div mat-card-avatar class="card-avatar warning">
+                <mat-icon>edit</mat-icon>
+              </div>
+              <mat-card-title>Edit Exam</mat-card-title>
+              <mat-card-subtitle>Modify exam details and settings</mat-card-subtitle>
+            </mat-card-header>
+
+            <mat-card-content>
+              <form class="exam-form">
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Exam Title</mat-label>
+                    <input
+                      matInput
+                      [(ngModel)]="editingExam.title"
+                      name="editTitle"
+                      required>
+                    <mat-icon matPrefix>title</mat-icon>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Duration (minutes)</mat-label>
+                    <input
+                      matInput
+                      type="number"
+                      [(ngModel)]="editingExam.duration"
+                      name="editDuration"
+                      min="1"
+                      max="300"
+                      required>
+                    <mat-icon matPrefix>timer</mat-icon>
+                  </mat-form-field>
+                </div>
+
+                <mat-form-field appearance="outline" class="form-field full-width">
+                  <mat-label>Description</mat-label>
+                  <textarea
+                    matInput
+                    [(ngModel)]="editingExam.description"
+                    name="editDescription"
+                    rows="4"
+                    required></textarea>
+                  <mat-icon matPrefix>description</mat-icon>
+                </mat-form-field>
+
+                <div class="form-actions">
+                  <button
+                    mat-raised-button
+                    color="primary"
+                    (click)="updateExam()">
+                    <mat-icon>save</mat-icon>
+                    Save Changes
+                  </button>
+                  <button
+                    mat-button
+                    (click)="cancelEditing()">
+                    <mat-icon>cancel</mat-icon>
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </mat-card-content>
+          </mat-card>
+        }
+      </div>
+    </div>
+
+    <!-- Questions Tab -->
+    <div *ngIf="activeTab === 'questions'" class="tab-content questions-tab">
+      <div class="tab-header">
+        <h2 class="tab-title">
+          <mat-icon>help_outline</mat-icon>
+          Question Management
+        </h2>
+        <p class="tab-description">Create and manage questions for your exams</p>
+      </div>
+
+      <div class="content-layout">
+        <!-- Exam Selection -->
+        <mat-card class="selection-card">
+          <mat-card-header>
+            <div mat-card-avatar class="card-avatar info">
+              <mat-icon>quiz</mat-icon>
+            </div>
+            <mat-card-title>Select Exam</mat-card-title>
+            <mat-card-subtitle>Choose an exam to manage its questions</mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Select Exam</mat-label>
+              <mat-select
+                [(value)]="selectedExamId"
+                (selectionChange)="loadQuestions($event.value)"
+                placeholder="Choose an exam">
+                @for (exam of exams; track exam._id) {
+                  <mat-option [value]="exam._id">
+                    {{ exam.title }} ({{ exam.duration }} min)
+                  </mat-option>
+                }
+              </mat-select>
+              <mat-icon matPrefix>quiz</mat-icon>
+              <mat-hint>Select an exam to view and manage its questions</mat-hint>
+            </mat-form-field>
+
+            @if (exams.length === 0) {
+              <div class="no-exams-message">
+                <mat-icon>info</mat-icon>
+                <span>No exams available. Create an exam first to add questions.</span>
+                <button mat-button color="primary" (click)="setActiveTab('exams')">
+                  Create Exam
+                </button>
+              </div>
+            }
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Question Creation Form -->
+        @if (selectedExamId) {
+          <mat-card class="create-card">
+            <mat-card-header>
+              <div mat-card-avatar class="card-avatar success">
+                <mat-icon>add_circle</mat-icon>
+              </div>
+              <mat-card-title>Create New Question</mat-card-title>
+              <mat-card-subtitle>Add a question to the selected exam</mat-card-subtitle>
+            </mat-card-header>
+
+            <mat-card-content>
+              <form class="question-form">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Question Text</mat-label>
+                  <textarea
+                    matInput
+                    [(ngModel)]="newQuestion.text"
+                    name="questionText"
+                    placeholder="Enter your question here..."
+                    rows="3"
+                    required></textarea>
+                  <mat-icon matPrefix>help_outline</mat-icon>
+                  <mat-hint>Write a clear and concise question</mat-hint>
+                </mat-form-field>
+
+                <div class="options-section">
+                  <h4 class="section-subtitle">Answer Options</h4>
+                  <div class="options-grid">
+                    @for (option of newQuestion.options; track $index; let i = $index) {
+                      <mat-form-field appearance="outline" class="option-field">
+                        <mat-label>Option {{ getOptionLabel(i) }}</mat-label>
+                        <input
+                          matInput
+                          [(ngModel)]="newQuestion.options[i]"
+                          [name]="'option' + i"
+                          placeholder="Enter option {{ getOptionLabel(i) }}"
+                          required>
+                        <mat-icon matPrefix>radio_button_unchecked</mat-icon>
+                      </mat-form-field>
+                    }
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Correct Answer</mat-label>
+                    <mat-select
+                      [(ngModel)]="newQuestion.correctAnswer"
+                      name="correctAnswer"
+                      required>
+                      @for (option of newQuestion.options; track $index; let i = $index) {
+                        <mat-option [value]="i">
+                          {{ getOptionLabel(i) }}: {{ option || 'Option ' + (i + 1) }}
+                        </mat-option>
+                      }
+                    </mat-select>
+                    <mat-icon matPrefix>check_circle</mat-icon>
+                    <mat-hint>Select the correct answer option</mat-hint>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Marks</mat-label>
+                    <input
+                      matInput
+                      type="number"
+                      [(ngModel)]="newQuestion.marks"
+                      name="marks"
+                      placeholder="1"
+                      min="1"
+                      max="10"
+                      required>
+                    <mat-icon matPrefix>grade</mat-icon>
+                    <mat-hint>Points awarded for correct answer</mat-hint>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-actions">
+                  <button
+                    mat-raised-button
+                    color="primary"
+                    (click)="createQuestion()"
+                    [disabled]="!isCreateQuestionFormValid()">
+                    <mat-icon>add</mat-icon>
+                    Add Question
+                  </button>
+                  <button
+                    mat-button
+                    type="button"
+                    (click)="resetQuestionForm()">
+                    <mat-icon>clear</mat-icon>
+                    Clear Form
+                  </button>
+                </div>
+              </form>
+            </mat-card-content>
+          </mat-card>
+        }
+
+        <!-- Questions List -->
+        @if (selectedExamId && questions.length > 0) {
+          <mat-card class="list-card">
+            <mat-card-header>
+              <div mat-card-avatar class="card-avatar success">
+                <mat-icon>list</mat-icon>
+              </div>
+              <mat-card-title>Questions for Selected Exam ({{ questions.length }})</mat-card-title>
+              <mat-card-subtitle>Manage existing questions</mat-card-subtitle>
+            </mat-card-header>
+
+            <mat-card-content>
+              <div class="questions-grid">
+                @for (question of questions; track question._id) {
+                  <mat-card class="question-card" [class.editing]="editingQuestion?._id === question._id">
+                    <mat-card-header>
+                      <div mat-card-avatar class="question-avatar">
+                        <span class="question-number">{{ $index + 1 }}</span>
+                      </div>
+                      <mat-card-title class="question-title">{{ question.text }}</mat-card-title>
+                      <mat-card-subtitle class="question-marks">
+                        <mat-icon>grade</mat-icon>
+                        {{ question.marks }} {{ question.marks === 1 ? 'mark' : 'marks' }}
+                      </mat-card-subtitle>
+                    </mat-card-header>
+
+                    <mat-card-content>
+                      <div class="question-options">
+                        @for (option of question.options; track $index; let i = $index) {
+                          <div class="option-item" [class.correct]="i === question.correctAnswer">
+                            <span class="option-label">{{ getOptionLabel(i) }}:</span>
+                            <span class="option-text">{{ option }}</span>
+                            @if (i === question.correctAnswer) {
+                              <mat-icon class="correct-icon">check_circle</mat-icon>
+                            }
+                          </div>
+                        }
+                      </div>
+                    </mat-card-content>
+
+                    <mat-card-actions class="question-actions">
+                      <button
+                        mat-button
+                        color="primary"
+                        (click)="startEditingQuestion(question)"
+                        matTooltip="Edit question">
+                        <mat-icon>edit</mat-icon>
+                        Edit
+                      </button>
+                      <button
+                        mat-button
+                        color="warn"
+                        (click)="deleteQuestion(question._id)"
+                        matTooltip="Delete question">
+                        <mat-icon>delete</mat-icon>
+                        Delete
+                      </button>
+                    </mat-card-actions>
+                  </mat-card>
+                }
+              </div>
+            </mat-card-content>
+          </mat-card>
+        }
+
+        <!-- Edit Question Form -->
+        @if (editingQuestion) {
+          <mat-card class="edit-card">
+            <mat-card-header>
+              <div mat-card-avatar class="card-avatar warning">
+                <mat-icon>edit</mat-icon>
+              </div>
+              <mat-card-title>Edit Question</mat-card-title>
+              <mat-card-subtitle>Modify question details and options</mat-card-subtitle>
+            </mat-card-header>
+
+            <mat-card-content>
+              <form class="question-form">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Question Text</mat-label>
+                  <textarea
+                    matInput
+                    [(ngModel)]="editingQuestion.text"
+                    name="editQuestionText"
+                    rows="3"
+                    required></textarea>
+                  <mat-icon matPrefix>help_outline</mat-icon>
+                  <mat-hint>Enter the question text</mat-hint>
+                </mat-form-field>
+
+                <div class="options-section">
+                  <h4 class="section-subtitle">Answer Options</h4>
+                  <div class="options-grid">
+                    @for (option of editingQuestion.options; track $index; let i = $index) {
+                      <mat-form-field appearance="outline" class="option-field">
+                        <mat-label>Option {{ getOptionLabel(i) }}</mat-label>
+                        <input
+                          matInput
+                          [(ngModel)]="editingQuestion.options[i]"
+                          [name]="'editOption' + i"
+                          required>
+                        <mat-icon matPrefix>radio_button_unchecked</mat-icon>
+                      </mat-form-field>
+                    }
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Correct Answer</mat-label>
+                    <mat-select
+                      [(ngModel)]="editingQuestion.correctAnswer"
+                      name="editCorrectAnswer"
+                      required>
+                      @for (option of editingQuestion.options; track $index; let i = $index) {
+                        <mat-option [value]="i">
+                          {{ getOptionLabel(i) }}: {{ option || 'Option ' + (i + 1) }}
+                        </mat-option>
+                      }
+                    </mat-select>
+                    <mat-icon matPrefix>check_circle</mat-icon>
+                    <mat-hint>Select the correct answer option</mat-hint>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Marks</mat-label>
+                    <input
+                      matInput
+                      type="number"
+                      [(ngModel)]="editingQuestion.marks"
+                      name="editMarks"
+                      min="1"
+                      max="10"
+                      required>
+                    <mat-icon matPrefix>grade</mat-icon>
+                    <mat-hint>Points awarded for correct answer</mat-hint>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-actions">
+                  <button
+                    mat-raised-button
+                    color="primary"
+                    (click)="updateQuestion()"
+                    [disabled]="loading">
+                    <mat-icon>save</mat-icon>
+                    @if (loading) {
+                      Updating...
+                    } @else {
+                      Save Changes
+                    }
+                  </button>
+                  <button
+                    mat-button
+                    (click)="cancelEditing()">
+                    <mat-icon>cancel</mat-icon>
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </mat-card-content>
+          </mat-card>
+        }
+      </div>
+    </div>
+
+    <!-- Results Tab -->
+    <div *ngIf="activeTab === 'results'" class="tab-content results-tab">
+      <div class="tab-header">
+        <h2 class="tab-title">
+          <mat-icon>assessment</mat-icon>
+          Results & Analytics
+        </h2>
+        <p class="tab-description">View exam results and performance analytics</p>
+      </div>
+
+      <div class="content-layout">
+        <mat-card class="results-card">
+          <mat-card-header>
+            <div mat-card-avatar class="card-avatar accent">
+              <mat-icon>analytics</mat-icon>
+            </div>
+            <mat-card-title>Exam Results</mat-card-title>
+            <mat-card-subtitle>Student performance and submission data</mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content>
+            <div class="search-section">
+              <mat-form-field appearance="outline" class="search-field">
+                <mat-label>Search Results</mat-label>
+                <input
+                  matInput
+                  [(ngModel)]="searchTerm"
+                  (input)="onSearchChange()"
+                  placeholder="Search by student name or exam title">
+                <mat-icon matPrefix>search</mat-icon>
+                <mat-hint>Filter results by student or exam</mat-hint>
+              </mat-form-field>
+            </div>
+
+            @if (results.length > 0) {
+              <div class="results-table-container">
+                <mat-table [dataSource]="filteredResults.length ? filteredResults : results" class="results-table">
+                  <ng-container matColumnDef="student">
+                    <mat-header-cell *matHeaderCellDef>Student</mat-header-cell>
+                    <mat-cell *matCellDef="let result">
+                      <div class="student-info">
+                        <mat-icon>person</mat-icon>
+                        <span>{{ result.studentId.username }}</span>
+                      </div>
+                    </mat-cell>
+                  </ng-container>
+
+                  <ng-container matColumnDef="exam">
+                    <mat-header-cell *matHeaderCellDef>Exam</mat-header-cell>
+                    <mat-cell *matCellDef="let result">
+                      <div class="exam-info">
+                        <mat-icon>quiz</mat-icon>
+                        <span>{{ result.examId.title }}</span>
+                      </div>
+                    </mat-cell>
+                  </ng-container>
+
+                  <ng-container matColumnDef="score">
+                    <mat-header-cell *matHeaderCellDef>Score</mat-header-cell>
+                    <mat-cell *matCellDef="let result">
+                      <div class="score-info">
+                        <mat-icon [class]="getScoreClass(result.percentage)">grade</mat-icon>
+                        <span class="score-value">{{ result.percentage }}%</span>
+                        <span class="score-details">({{ result.score }}/{{ result.totalMarks }})</span>
+                      </div>
+                    </mat-cell>
+                  </ng-container>
+
+                  <ng-container matColumnDef="submittedAt">
+                    <mat-header-cell *matHeaderCellDef>Submitted</mat-header-cell>
+                    <mat-cell *matCellDef="let result">
+                      <div class="date-info">
+                        <mat-icon>schedule</mat-icon>
+                        <span>{{ result.submittedAt | date:'short' }}</span>
+                      </div>
+                    </mat-cell>
+                  </ng-container>
+
+                  <ng-container matColumnDef="answers">
+                    <mat-header-cell *matHeaderCellDef>Answers</mat-header-cell>
+                    <mat-cell *matCellDef="let result">
+                      <div class="answers-info">
+                        <mat-icon>assignment</mat-icon>
+                        <span>{{ result.answers.length }} submitted</span>
+                      </div>
+                    </mat-cell>
+                  </ng-container>
+
+                  <mat-header-row *matHeaderRowDef="['student', 'exam', 'score', 'submittedAt', 'answers']"></mat-header-row>
+                  <mat-row *matRowDef="let row; columns: ['student', 'exam', 'score', 'submittedAt', 'answers']"></mat-row>
+                </mat-table>
+              </div>
+            } @else {
+              <div class="empty-state">
+                <div class="empty-icon">
+                  <mat-icon>assessment</mat-icon>
+                </div>
+                <h3 class="empty-title">No Results Available</h3>
+                <p class="empty-description">No exam submissions have been recorded yet</p>
+              </div>
+            }
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+
+    <!-- Users Tab -->
+    <div *ngIf="activeTab === 'users'" class="tab-content users-tab">
+      <div class="tab-header">
+        <h2 class="tab-title">
+          <mat-icon>people</mat-icon>
+          User Management
+        </h2>
+        <p class="tab-description">Manage system users and their permissions</p>
+      </div>
+
+      <div class="content-layout">
+        <mat-card class="users-card">
+          <mat-card-header>
+            <div mat-card-avatar class="card-avatar warning">
+              <mat-icon>people</mat-icon>
+            </div>
+            <mat-card-title>System Users ({{ users.length }})</mat-card-title>
+            <mat-card-subtitle>Registered students and administrators</mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content>
+            @if (users.length > 0) {
+              <div class="users-grid">
+                @for (user of users; track user._id) {
+                  <mat-card class="user-card">
+                    <mat-card-header>
+                      <div mat-card-avatar [class]="'user-avatar ' + user.role">
+                        <mat-icon>{{ user.role === 'admin' ? 'admin_panel_settings' : 'person' }}</mat-icon>
+                      </div>
+                      <mat-card-title>{{ user.username }}</mat-card-title>
+                      <mat-card-subtitle>{{ user.email }}</mat-card-subtitle>
+                    </mat-card-header>
+
+                    <mat-card-content>
+                      <div class="user-details">
+                        <div class="detail-item">
+                          <mat-icon>badge</mat-icon>
+                          <span class="role-badge" [class]="user.role">{{ user.role | titlecase }}</span>
+                        </div>
+                        <div class="detail-item">
+                          <mat-icon>date_range</mat-icon>
+                          <span>Joined: {{ user.createdAt | date:'short' }}</span>
+                        </div>
+                      </div>
+                    </mat-card-content>
+
+                    <mat-card-actions>
+                      <button mat-button color="primary">
+                        <mat-icon>edit</mat-icon>
+                        Edit
+                      </button>
+                      <button mat-button color="warn" [disabled]="user.role === 'admin'">
+                        <mat-icon>delete</mat-icon>
+                        Delete
+                      </button>
+                    </mat-card-actions>
+                  </mat-card>
+                }
+              </div>
+            } @else {
+              <div class="empty-state">
+                <div class="empty-icon">
+                  <mat-icon>people</mat-icon>
+                </div>
+                <h3 class="empty-title">No Users Found</h3>
+                <p class="empty-description">No users are registered in the system</p>
+              </div>
+            }
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+
+    <!-- Exam Reset Management Tab -->
+    <div *ngIf="activeTab === 'exam-resets'" class="tab-content exam-resets-tab">
+      <div class="tab-header">
+        <h2 class="tab-title">
+          <mat-icon>refresh</mat-icon>
+          Exam Reset Management
+        </h2>
+        <p class="tab-description">Manage exam retakes for students who have failed exams</p>
+      </div>
+
+      <app-exam-reset-manager></app-exam-reset-manager>
+    </div>
+  </main>
+</div>
