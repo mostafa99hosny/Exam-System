@@ -1,0 +1,19 @@
+
+.result-manage-root {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px 0;
+}
+.search-field {
+  width: 350px;
+  margin-bottom: 18px;
+}
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80px;
+}

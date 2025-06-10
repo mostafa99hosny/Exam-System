@@ -1,0 +1,31 @@
+
+.result-view-root {
+  margin: 0 auto;
+  max-width: 400px;
+  padding: 24px 0;
+}
+mat-card {
+  border-radius: 16px;
+  box-shadow: 0 6px 24px rgba(33,150,243,0.10), 0 1.5px 4px rgba(33,150,243,0.10);
+  background: #fff;
+}
+mat-card-title {
+  font-size: 1.4em;
+  font-weight: 700;
+  color: #1976d2;
+  text-align: center;
+  margin-bottom: 12px;
+}
+mat-card-content p {
+  font-size: 1.1em;
+  margin: 8px 0;
+}
+button[mat-raised-button] {
+  margin-top: 18px;
+  width: 100%;
+  font-size: 1.1rem;
+  font-weight: 600;
+  background: linear-gradient(90deg, #1976d2 0%, #2196f3 100%);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(33,150,243,0.15);
+}
