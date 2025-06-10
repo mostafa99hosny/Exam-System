@@ -1,1 +1,170 @@
-<p>exam-taking works!</p>
+<div *ngIf="exam && questions.length && !loading" class="exam-taking-container">
+  <!-- Header with Timer and Progress -->
+  <div class="exam-header">
+    <div class="exam-info">
+      <h1 class="exam-title">{{ exam.title }}</h1>
+      <p class="exam-description">{{ exam.description }}</p>
+    </div>
+
+    <div class="timer-section" [ngClass]="getTimeRemainingClass()">
+      <div class="timer-icon">
+        <mat-icon>timer</mat-icon>
+      </div>
+      <div class="timer-content">
+        <div class="time-remaining">{{ timeRemainingFormatted }}</div>
+        <div class="time-label">Time Remaining</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress Bar -->
+  <div class="progress-section">
+    <div class="progress-info">
+      <span class="progress-text">
+        Question {{ currentQuestionIndex + 1 }} of {{ totalQuestions }}
+      </span>
+      <span class="progress-percentage">
+        {{ progressPercentage | number:'1.0-0' }}% Complete
+      </span>
+    </div>
+    <mat-progress-bar
+      mode="determinate"
+      [value]="progressPercentage"
+      class="progress-bar">
+    </mat-progress-bar>
+  </div>
+
+  <!-- Question Navigation -->
+  <div class="question-navigation">
+    <div class="nav-buttons">
+      <button
+        mat-icon-button
+        [disabled]="currentQuestionIndex === 0"
+        (click)="previousQuestion()"
+        class="nav-btn">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+
+      <div class="question-indicators">
+        <button
+          *ngFor="let question of questions; let i = index"
+          mat-mini-fab
+          [ngClass]="getQuestionStatusClass(question._id)"
+          [class.current]="i === currentQuestionIndex"
+          (click)="goToQuestion(i)"
+          class="question-indicator">
+          {{ i + 1 }}
+        </button>
+      </div>
+
+      <button
+        mat-icon-button
+        [disabled]="currentQuestionIndex === totalQuestions - 1"
+        (click)="nextQuestion()"
+        class="nav-btn">
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Current Question -->
+  <div class="question-section" *ngIf="getCurrentQuestion() as currentQuestion">
+    <mat-card class="question-card animate-fade-in">
+      <mat-card-header>
+        <mat-card-title class="question-title">
+          <span class="question-number">Question {{ currentQuestionIndex + 1 }}</span>
+          <span class="question-marks">({{ currentQuestion.marks }} marks)</span>
+        </mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="question-text">{{ currentQuestion.text }}</div>
+
+        <div class="options-container">
+          <mat-radio-group
+            [value]="answers[currentQuestion._id]"
+            (change)="selectAnswer(currentQuestion._id, $event.value)"
+            class="options-group">
+            <mat-radio-button
+              *ngFor="let option of currentQuestion.options; let j = index"
+              [value]="j"
+              class="option-button">
+              <span class="option-label">{{ getOptionLabel(j) }}.</span>
+              <span class="option-text">{{ option }}</span>
+            </mat-radio-button>
+          </mat-radio-group>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Navigation Controls -->
+  <div class="navigation-controls">
+    <div class="nav-left">
+      <button
+        mat-button
+        color="warn"
+        (click)="onCancel()"
+        class="cancel-btn">
+        <mat-icon>close</mat-icon>
+        Exit Exam
+      </button>
+    </div>
+
+    <div class="nav-center">
+      <button
+        mat-button
+        [disabled]="currentQuestionIndex === 0"
+        (click)="previousQuestion()"
+        class="nav-control-btn">
+        <mat-icon>navigate_before</mat-icon>
+        Previous
+      </button>
+
+      <button
+        mat-button
+        [disabled]="currentQuestionIndex === totalQuestions - 1"
+        (click)="nextQuestion()"
+        class="nav-control-btn">
+        Next
+        <mat-icon>navigate_next</mat-icon>
+      </button>
+    </div>
+
+    <div class="nav-right">
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="onSubmit()"
+        class="submit-btn btn-gradient-primary">
+        <mat-icon>send</mat-icon>
+        Submit Exam
+      </button>
+    </div>
+  </div>
+
+  <!-- Auto-save Indicator -->
+  <div class="auto-save-indicator" *ngIf="lastSaved">
+    <mat-icon>cloud_done</mat-icon>
+    <span>Last saved: {{ lastSaved | date:'short' }}</span>
+  </div>
+</div>
+
+<!-- Loading State -->
+<div *ngIf="loading" class="loading-container">
+  <div class="loading-content">
+    <mat-progress-spinner diameter="60" color="primary" mode="indeterminate"></mat-progress-spinner>
+    <p class="loading-text">Loading exam...</p>
+  </div>
+</div>
+
+<!-- Empty State -->
+<div *ngIf="!exam || !questions.length" class="empty-state">
+  <mat-icon class="empty-icon">quiz</mat-icon>
+  <h2>No Exam Available</h2>
+  <p>The exam could not be loaded. Please try again later.</p>
+  <button mat-raised-button color="primary" (click)="onCancel()">
+    <mat-icon>arrow_back</mat-icon>
+    Go Back
+  </button>
+</div>

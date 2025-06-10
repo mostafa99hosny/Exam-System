@@ -1,0 +1,338 @@
+/* Exam Reset Manager Styles */
+.exam-reset-manager {
+  padding: 2rem;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+}
+
+.manager-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.manager-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #3f51b5;
+  margin: 0;
+}
+
+.manager-description {
+  color: #666;
+  font-size: 1.1rem;
+  margin-top: 0.5rem;
+}
+
+.manager-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Card Styles */
+mat-card {
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+mat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.card-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  color: white;
+}
+
+.card-avatar.primary {
+  background: linear-gradient(135deg, #3f51b5, #5c6bc0);
+}
+
+.card-avatar.info {
+  background: linear-gradient(135deg, #2196f3, #42a5f5);
+}
+
+.card-avatar.warn {
+  background: linear-gradient(135deg, #ff9800, #ffb74d);
+}
+
+/* Student Selection */
+.student-select {
+  width: 100%;
+  max-width: 500px;
+}
+
+/* Loading and Empty States */
+.loading-state, .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  text-align: center;
+}
+
+.empty-state mat-icon {
+  font-size: 4rem;
+  width: 4rem;
+  height: 4rem;
+  color: #ccc;
+  margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+  color: #666;
+  margin: 0.5rem 0;
+}
+
+.empty-state p {
+  color: #999;
+}
+
+.empty-state .info-text {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #3f51b5;
+  font-weight: 500;
+  margin-top: 1rem;
+}
+
+/* Exam History Accordion */
+.exam-panel {
+  margin-bottom: 1rem;
+  border-radius: 12px !important;
+  overflow: hidden;
+}
+
+.exam-title-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+}
+
+.exam-name {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.exam-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.attempts-info {
+  color: #666;
+}
+
+.best-score {
+  font-weight: 600;
+  color: #3f51b5;
+}
+
+/* Status Chips */
+.status-chip {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  border-radius: 16px;
+}
+
+.status-chip.can-reset {
+  background: #e8f5e8;
+  color: #2e7d32;
+}
+
+.status-chip.no-reset {
+  background: #ffebee;
+  color: #c62828;
+}
+
+/* Exam Details */
+.exam-details {
+  padding: 1rem 0;
+}
+
+.exam-info {
+  margin-bottom: 1rem;
+}
+
+.exam-info p {
+  margin: 0.5rem 0;
+  color: #666;
+}
+
+.attempts-section h4 {
+  color: #3f51b5;
+  margin: 1rem 0 0.5rem 0;
+}
+
+.attempts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.attempt-item {
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #3f51b5;
+}
+
+.attempt-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.attempt-number {
+  font-weight: 600;
+  color: #3f51b5;
+}
+
+.attempt-details {
+  display: flex;
+  gap: 2rem;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+/* Reset Actions */
+.reset-actions {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.reset-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #666;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+/* Failed Students List */
+.failed-students-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.failed-student-item {
+  padding: 1.5rem;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+  transition: all 0.3s ease;
+}
+
+.failed-student-item:hover {
+  border-color: #3f51b5;
+  box-shadow: 0 4px 12px rgba(63, 81, 181, 0.1);
+}
+
+.student-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.student-info h4 {
+  margin: 0;
+  color: #3f51b5;
+  font-weight: 600;
+}
+
+.student-info p {
+  margin: 0.25rem 0 0 0;
+  color: #666;
+  font-size: 0.875rem;
+}
+
+.failed-exams {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.failed-exam-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.failed-exam-item .exam-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.failed-exam-item .exam-title {
+  font-weight: 500;
+  color: #333;
+}
+
+.exam-stats {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .exam-reset-manager {
+    padding: 1rem;
+  }
+
+  .manager-title {
+    font-size: 1.5rem;
+  }
+
+  .student-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .failed-exam-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .exam-stats {
+    align-self: flex-end;
+  }
+
+  .attempt-details {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}

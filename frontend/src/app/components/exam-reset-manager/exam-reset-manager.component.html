@@ -1,0 +1,198 @@
+<div class="exam-reset-manager">
+  <div class="manager-header">
+    <h2 class="manager-title">
+      <mat-icon>refresh</mat-icon>
+      Exam Reset Management
+    </h2>
+    <p class="manager-description">
+      Manage exam retakes for students who have failed exams. Students can retake failed exams up to 3 times total.
+    </p>
+  </div>
+
+  <div class="manager-content">
+    <!-- Student Selection Section -->
+    <mat-card class="selection-card">
+      <mat-card-header>
+        <div mat-card-avatar class="card-avatar primary">
+          <mat-icon>person_search</mat-icon>
+        </div>
+        <mat-card-title>Select Student</mat-card-title>
+        <mat-card-subtitle>Choose a student to view their exam history and manage resets</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <mat-form-field appearance="outline" class="student-select">
+          <mat-label>Select Student</mat-label>
+          <mat-select [(value)]="selectedStudent" (selectionChange)="onStudentSelected()">
+            <mat-option *ngFor="let student of allStudents" [value]="student">
+              {{ student.username }} ({{ student.email }})
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>person</mat-icon>
+          <mat-hint>Select a student to view their exam history</mat-hint>
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Student Exam History -->
+    <mat-card *ngIf="selectedStudent" class="history-card">
+      <mat-card-header>
+        <div mat-card-avatar class="card-avatar info">
+          <mat-icon>history</mat-icon>
+        </div>
+        <mat-card-title>{{ selectedStudent.username }}'s Exam History</mat-card-title>
+        <mat-card-subtitle>View all exam attempts and manage resets</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div *ngIf="loadingHistory" class="loading-state">
+          <mat-spinner diameter="40"></mat-spinner>
+          <p>Loading exam history...</p>
+        </div>
+
+        <div *ngIf="!loadingHistory && studentExamHistory.length === 0" class="empty-state">
+          <mat-icon>assignment</mat-icon>
+          <h3>No Exam History</h3>
+          <p>This student has not taken any exams yet or all exam history has been reset.</p>
+          <p class="info-text">
+            <mat-icon>info</mat-icon>
+            The student can take all available exams from the beginning.
+          </p>
+        </div>
+
+        <mat-accordion *ngIf="!loadingHistory && studentExamHistory.length > 0">
+          <mat-expansion-panel *ngFor="let examHistory of studentExamHistory" class="exam-panel">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <div class="exam-title-section">
+                  <span class="exam-name">{{ examHistory.exam.title }}</span>
+                  <mat-chip [class]="'status-chip ' + (examHistory.canReset ? 'can-reset' : 'no-reset')">
+                    {{ examHistory.canReset ? 'Can Reset' : 'Cannot Reset' }}
+                  </mat-chip>
+                </div>
+              </mat-panel-title>
+              <mat-panel-description>
+                <div class="exam-summary">
+                  <span class="attempts-info">{{ getAttemptStatus(examHistory.attempts) }}</span>
+                  <span class="best-score">Best: {{ examHistory.bestScore }}%</span>
+                </div>
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <div class="exam-details">
+              <div class="exam-info">
+                <p><strong>Description:</strong> {{ examHistory.exam.description }}</p>
+                <p><strong>Duration:</strong> {{ examHistory.exam.duration }} minutes</p>
+                <p><strong>Total Attempts:</strong> {{ examHistory.totalAttempts }}/3</p>
+                <p><strong>Best Score:</strong> {{ examHistory.bestScore }}%</p>
+                <p><strong>Last Attempt:</strong> {{ formatDate(examHistory.lastAttempt) }}</p>
+              </div>
+
+              <mat-divider></mat-divider>
+
+              <div class="attempts-section">
+                <h4>Attempt History</h4>
+                <div class="attempts-list">
+                  <div *ngFor="let attempt of examHistory.attempts; let i = index" class="attempt-item">
+                    <div class="attempt-header">
+                      <span class="attempt-number">Attempt {{ attempt.attemptNumber }}</span>
+                      <mat-chip [color]="getScoreColor(attempt.percentage)">
+                        {{ attempt.percentage }}% ({{ getGradeFromScore(attempt.percentage) }})
+                      </mat-chip>
+                    </div>
+                    <div class="attempt-details">
+                      <span>Score: {{ attempt.score }}/{{ attempt.totalMarks }}</span>
+                      <span>Date: {{ formatDate(attempt.submittedAt) }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <mat-divider></mat-divider>
+
+              <div class="reset-actions" *ngIf="examHistory.hasFailed">
+                <button 
+                  mat-raised-button 
+                  color="warn"
+                  [disabled]="!examHistory.canReset"
+                  (click)="resetExam(selectedStudent!._id, examHistory.exam._id, examHistory.exam.title)"
+                  matTooltip="{{ examHistory.canReset ? 'Allow student to retake this exam' : 'Maximum attempts reached or student has passed' }}">
+                  <mat-icon>refresh</mat-icon>
+                  Reset Exam
+                </button>
+                <p class="reset-info" *ngIf="!examHistory.canReset">
+                  <mat-icon>info</mat-icon>
+                  Cannot reset: {{ examHistory.totalAttempts >= 3 ? 'Maximum attempts reached' : 'Student has passed' }}
+                </p>
+              </div>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Failed Students Quick View -->
+    <mat-card class="failed-students-card">
+      <mat-card-header>
+        <div mat-card-avatar class="card-avatar warn">
+          <mat-icon>warning</mat-icon>
+        </div>
+        <mat-card-title>Students with Failed Exams</mat-card-title>
+        <mat-card-subtitle>Quick overview of students who can retake exams</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div *ngIf="loading" class="loading-state">
+          <mat-spinner diameter="40"></mat-spinner>
+          <p>Loading failed students...</p>
+        </div>
+
+        <div *ngIf="!loading && failedStudents.length === 0" class="empty-state">
+          <mat-icon>check_circle</mat-icon>
+          <h3>No Failed Students</h3>
+          <p>All students have either passed their exams or reached maximum attempts.</p>
+        </div>
+
+        <div *ngIf="!loading && failedStudents.length > 0" class="failed-students-list">
+          <div *ngFor="let failedStudent of failedStudents" class="failed-student-item">
+            <div class="student-header">
+              <div class="student-info">
+                <h4>{{ failedStudent.student.username }}</h4>
+                <p>{{ failedStudent.student.email }}</p>
+              </div>
+              <button
+                mat-button
+                color="primary"
+                (click)="selectFailedStudent(failedStudent.student)">
+                <mat-icon>visibility</mat-icon>
+                View Details
+              </button>
+            </div>
+            
+            <div class="failed-exams">
+              <div *ngFor="let failedExam of failedStudent.failedExams" class="failed-exam-item">
+                <div class="exam-info">
+                  <span class="exam-title">{{ failedExam.exam.title }}</span>
+                  <mat-chip [class]="'status-chip ' + (failedExam.canReset ? 'can-reset' : 'no-reset')">
+                    {{ failedExam.canReset ? 'Can Reset' : 'Max Attempts' }}
+                  </mat-chip>
+                </div>
+                <div class="exam-stats">
+                  <span>{{ failedExam.totalAttempts }}/3 attempts</span>
+                  <button 
+                    *ngIf="failedExam.canReset"
+                    mat-icon-button 
+                    color="warn"
+                    (click)="resetExam(failedStudent.student._id, failedExam.exam._id, failedExam.exam.title)"
+                    matTooltip="Reset this exam">
+                    <mat-icon>refresh</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

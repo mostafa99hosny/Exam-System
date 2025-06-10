@@ -1,0 +1,34 @@
+
+.exam-list-root {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  justify-content: center;
+  align-items: flex-start;
+  margin: 0 auto;
+  padding: 16px 0;
+}
+.exam-card {
+  width: 340px;
+  border-radius: 16px;
+  box-shadow: 0 6px 24px rgba(33,150,243,0.10), 0 1.5px 4px rgba(33,150,243,0.10);
+  background: #fff;
+  margin-bottom: 12px;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.exam-card:hover {
+  box-shadow: 0 12px 32px rgba(33,150,243,0.18);
+  transform: translateY(-2px) scale(1.03);
+}
+.no-exams {
+  color: #888;
+  font-size: 1.2rem;
+  text-align: center;
+  margin-top: 32px;
+}
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 180px;
+}
