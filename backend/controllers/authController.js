@@ -53,9 +53,22 @@ exports.getCurrentUser = async (req, res) => {
 
 exports.getUsers = async (req, res) => {
     try {
-        const users = await User.find().select('-password');
+        // Check if user is admin
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ msg: 'Admin access required' });
+        }
+
+        const { role } = req.query;
+        let filter = {};
+
+        if (role) {
+            filter.role = role;
+        }
+
+        const users = await User.find(filter).select('-password');
         res.json(users);
     } catch (err) {
-        res.status(500).send('Server error');
+        console.error('Error getting users:', err);
+        res.status(500).json({ msg: 'Server error' });
     }
 };
